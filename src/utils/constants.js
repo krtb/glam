@@ -1,4 +1,3 @@
-
 const top = 32;
 export const buildIDComparisonGraph = {
   width: 425,
@@ -7,7 +6,7 @@ export const buildIDComparisonGraph = {
   left: 60,
   bottom: 24,
   top,
-  insufficientDataAdjustment: 100, // amount of space to remove from graph when hidden
+  insufficientDataAdjustment: 100 // amount of space to remove from graph when hidden
 };
 
 export const explorerComparisonSmallMultiple = {
@@ -17,7 +16,7 @@ export const explorerComparisonSmallMultiple = {
   right: 64,
   top,
   bottom: buildIDComparisonGraph.bottom,
-  insufficientDataAdjustment: buildIDComparisonGraph.insufficientDataAdjustment, // amount of width to add to graph when buildIDComparisonGraph is hidden
+  insufficientDataAdjustment: buildIDComparisonGraph.insufficientDataAdjustment // amount of width to add to graph when buildIDComparisonGraph is hidden
 };
 
 // for the table views.
@@ -26,10 +25,10 @@ export const comparisonSmallMultiple = {
   width: 200,
   height: 50,
   left: 20,
-  right: 20,
+  right: 20
 };
 
 export const proportionSmallMultiple = {
   width: 80,
-  height: 16,
+  height: 16
 };

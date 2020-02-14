@@ -1,14 +1,14 @@
-import { storiesOf } from '@storybook/svelte';
+import { storiesOf } from "@storybook/svelte";
 
-import CenteredBody from './CenteredBody.svelte';
-import BigDrawerBody from './BigDrawerBody.svelte';
+import CenteredBody from "./CenteredBody.svelte";
+import BigDrawerBody from "./BigDrawerBody.svelte";
 
-import '../../public/static/global.css';
+import "../../public/static/global.css";
 
-storiesOf('Layout', module)
-  .add('Centered Body', () => ({
-    Component: CenteredBody,
+storiesOf("Layout", module)
+  .add("Centered Body", () => ({
+    Component: CenteredBody
   }))
-  .add('BigDrawerBody', () => ({
-    Component: BigDrawerBody,
+  .add("BigDrawerBody", () => ({
+    Component: BigDrawerBody
   }));

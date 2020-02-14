@@ -1,30 +1,39 @@
 /* eslint-disable import/prefer-default-export */
-import { spring } from 'svelte/motion';
-import { derived } from 'svelte/store';
+import { spring } from "svelte/motion";
+import { derived } from "svelte/store";
 
-export function histogramSpring(initial, params = { damping: 1, stiffness: 0.9 }) {
+export function histogramSpring(
+  initial,
+  params = { damping: 1, stiffness: 0.9 }
+) {
   function getHistValues(d) {
-    return d.map((di) => di.value);
+    return d.map(di => di.value);
   }
   let value = initial;
   const referenceDistSpring = spring(getHistValues(value), params);
 
-  const { subscribe } = derived(referenceDistSpring,
-    ($d) => $d.map((di, i) => ({ value: di, bin: value[i].bin })));
+  const { subscribe } = derived(referenceDistSpring, $d =>
+    $d.map((di, i) => ({ value: di, bin: value[i].bin }))
+  );
   return {
     subscribe,
-    setValue: (v) => {
+    setValue: v => {
       value = v;
       referenceDistSpring.set(getHistValues(value));
-    },
+    }
   };
 }
 
-export function twoPointSpring(initialHoverValue, initialReferenceValue, scale, colorMap = () => 'black') {
+export function twoPointSpring(
+  initialHoverValue,
+  initialReferenceValue,
+  scale,
+  colorMap = () => "black"
+) {
   function ptToSpringValue(pt) {
     if (pt === undefined) return undefined;
     const out = { ...pt };
-    Object.keys(out).forEach((k) => {
+    Object.keys(out).forEach(k => {
       out[k] = scale(out[k]);
     });
     return out;
@@ -54,6 +63,6 @@ export function twoPointSpring(initialHoverValue, initialReferenceValue, scale, 
     },
     setReference: (p, hard = false) => {
       rightValues.set(ptToSpringValue(p), { hard });
-    },
+    }
   };
 }

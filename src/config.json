@@ -4,42 +4,42 @@
       "title": "Probe Name",
       "skipValidation": true
     },
-    "os" : {
+    "os": {
       "title": "Operating System",
       "key": "os",
       "values": [
-        {"key": "ALL", "label": "All OSes", "keyTransform": "NULL"},
-        {"key": "Windows", "label": "Windows"},
-        {"key": "Mac", "label": "Mac"},
-        {"key": "Linux", "label": "Linux"}
+        { "key": "ALL", "label": "All OSes", "keyTransform": "NULL" },
+        { "key": "Windows", "label": "Windows" },
+        { "key": "Mac", "label": "Mac" },
+        { "key": "Linux", "label": "Linux" }
       ]
     },
-    "channel" : {
+    "channel": {
       "title": "Channel",
       "key": "channel",
       "values": [
-        {"key": "nightly", "label": "Nightly"},
-        {"key": "beta", "label": "Beta"},
-        {"key": "release", "label": "Release"}
+        { "key": "nightly", "label": "Nightly" },
+        { "key": "beta", "label": "Beta" },
+        { "key": "release", "label": "Release" }
       ]
     },
     "aggregationLevel": {
       "title": "Aggregation Level",
       "key": "aggregationLevel",
       "values": [
-        {"key": "build_id", "label": "by build id"},
-        {"key": "version", "label": "by major version"}
+        { "key": "build_id", "label": "by build id" },
+        { "key": "version", "label": "by major version" }
       ]
     },
-    "versions" : {
+    "versions": {
       "title": "Versions",
       "key": "version",
       "type": "multi",
       "skipValidation": true,
       "values": [
-        {"key": "nightly", "label": "Nightly"},
-        {"key": "beta", "label": "Beta"},
-        {"key": "release", "label": "release"}
+        { "key": "nightly", "label": "Nightly" },
+        { "key": "beta", "label": "Beta" },
+        { "key": "release", "label": "release" }
       ]
     }
   }

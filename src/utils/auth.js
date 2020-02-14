@@ -1,11 +1,11 @@
 /* eslint-disable import/prefer-default-export */
 
-import createAuth0Client from '@auth0/auth0-spa-js';
+import createAuth0Client from "@auth0/auth0-spa-js";
 
 let auth0 = null;
 
 function fetchAuthConfig() {
-  return fetch('__BASE_DOMAIN__/api/v1/front-end-auth-config/');
+  return fetch("__BASE_DOMAIN__/api/v1/front-end-auth-config/");
 }
 
 async function configureClient() {
@@ -16,7 +16,7 @@ async function configureClient() {
     domain: config.domain,
     client_id: config.clientID,
     audience: config.audience,
-    scope: config.scope,
+    scope: config.scope
   });
 }
 
@@ -34,13 +34,13 @@ export function authenticate(successCallback) {
       withToken(successCallback);
     } else {
       const query = window.location.search;
-      if (query.includes('code=') && query.includes('state=')) {
+      if (query.includes("code=") && query.includes("state=")) {
         await auth0.handleRedirectCallback();
         window.location.reload();
         withToken(successCallback);
       } else {
         await auth0.loginWithRedirect({
-          redirect_uri: window.location.href,
+          redirect_uri: window.location.href
         });
       }
     }
