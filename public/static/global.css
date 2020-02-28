@@ -937,5 +937,56 @@ tr td.data-cell--graphic:hover {
     justify-items: center;
 }
 
+h2 {
+    margin: 0;
+    margin-bottom: var(--space-4x);
+    color: var(--cool-gray-600);
+}
 
+h2 span {
+    font-weight: normal;
+    color: var(--cool-gray-750);
+}
 
+.graphic-body__title--padding {
+    padding-left: var(--space-4x);
+    padding-right: var(--space-4x);
+}
+
+.graphic-body__content {
+    box-sizing: border-box;
+    grid-area: content-body;
+    min-height: var(--height);
+    background-color: white;
+
+    padding: var(--space-4x);
+    padding-top: var(--space-2x);
+
+    border-right: 2px solid var(--cool-gray-100);
+    border-radius: var(--content-border-radius) 0 0 var(--content-border-radius);
+}
+
+.graphic-body__content--no-padding {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.graphic-body__details {
+    grid-area: right;
+    border-radius: 0 var(--content-border-radius) var(--content-border-radius) 0;
+}
+
+.graphic-body {
+    height: 100%;
+    display: grid;
+    grid-template-areas: "content-body right";
+    grid-template-columns: calc(var(--space-base) * 120) auto;
+    box-shadow: var(--depth-large);
+    border-radius: var(--content-border-radius);
+}
+
+.graphic-body > div:only-child {
+    border-right: 0;
+    border-radius: var(--content-border-radius);
+    width: var(--main-content-width);
+}

@@ -1,8 +1,4 @@
 <script>
-
-// NOTE: something like this should probably be the sapper layout.
-// you will need to add additional routes for explore & table.
-
 import { onMount } from 'svelte';
 
 import App from 'udgl/layout/App.svelte';
@@ -19,6 +15,9 @@ import Search from '../components/search/Search.svelte';
 import ProbeViewControl from '../components/controls/ProbeViewControl.svelte';
 
 import { currentQuery } from '../state/store';
+import { url } from '../state/url';
+
+export let section;
 
 let visible = false;
 
@@ -35,7 +34,10 @@ $: if (visible) {
 
 onMount(() => { visible = true; });
 
+let width;
 </script>
+
+<svelte:window bind:innerWidth={width} />
 
 <App>
   <Toolbar sticky>
@@ -45,12 +47,14 @@ onMount(() => { visible = true; });
   </Toolbar>
   <Content centered>
     <ContentHeader>
-      <ProbeViewControl />
+      {#if section === "probe"}
+        <ProbeViewControl />
+      {/if}
     </ContentHeader>
     <ContentBody>
-
-      <slot></slot>
-      
+      <div class="graphic-body">
+        <slot></slot>
+      </div>
     </ContentBody>
     <ContentFooter>
       <Footer />

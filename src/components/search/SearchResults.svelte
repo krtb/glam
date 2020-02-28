@@ -6,6 +6,7 @@ import { afterUpdate } from 'svelte';
 import Portal from 'udgl/Portal.svelte';
 import LineSegSpinner from 'udgl/LineSegSpinner.svelte';
 
+import { url, navigateToProbe } from '../../state/url';
 import {
   searchResults, store,
 } from '../../state/store';
@@ -50,10 +51,10 @@ const handleKeypress = (event) => {
     if (key === 'ArrowUp') keyUp(event.target);
     if (key === 'ArrowDown') keyDown(event.target);
     if (key === 'Enter') {
-      store.setProbe($searchResults.results[focusedItem].name);
       store.setField('searchIsActive', false);
       // reset focused element
       focusedItem = 0;
+      navigateToProbe({ name: $searchResults.results[focusedItem].name });
     }
     if (key === 'Escape') {
       store.setField('searchIsActive', true);
@@ -238,8 +239,8 @@ li {
                   role="option"
                   id={name}
                   class:focused={focusedItem === i} on:click={() => {
-                    store.setProbe($searchResults.results[focusedItem].name);
-              }}
+                    navigateToProbe({ name: $searchResults.results[focusedItem].name });
+                  }}
                   on:mouseover={() => { focusedItem = i; }}>
                   <div class="name body-text--short-01">{name}</div>
                   <div class="probe-type label label-text--01 label--{type}">{type}</div>

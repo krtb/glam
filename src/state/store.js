@@ -4,13 +4,14 @@ import { createCatColorMap } from 'udgl/data-graphics/utils/color-maps';
 import { createStore } from '../utils/create-store';
 
 // FIXME: take care of this dependency cycle.
-import telemetrySearch, { probeSet } from './telemetry-search'; // eslint-disable-line
+import telemetrySearch, { probeSet, currentProbe } from './telemetry-search'; // eslint-disable-line import/no-cycle
 
 import { getProbeData } from './api';
 
 import CONFIG from '../config.json';
 
 import { byKeyAndAggregation, getProbeViewType } from '../utils/probe-utils';
+import { url } from './url';
 
 
 export function getField(fieldKey) {
@@ -77,16 +78,8 @@ export function getFromQueryStringOrDefault(fieldKey, isMulti = false) {
 }
 
 const initialState = {
-  probe: {
-    name: getFromQueryString('probe'),
-    description: undefined,
-    audienceSize: 0,
-    totalSize: 0,
-    versions: [],
-  },
   dashboardMode: { }, // FIXME: applicationStatus or dashboardMode, not both.
   aggregationLevel: getFromQueryStringOrDefault('aggregationLevel'),
-  product: 'Firefox',
   channel: getFromQueryStringOrDefault('channel'),
   os: getFromQueryString('os') || 'Windows',
   versions: getFromQueryString('versions', true) || [],
@@ -97,27 +90,16 @@ const initialState = {
   proportionMetricType: getFromQueryString('proportionMetricType') || 'proportions', //
   activeBuckets: getFromQueryString('activeBuckets', true) || [],
   applicationStatus: 'INITIALIZING', // FIXME: applicationStatus or dashboardMode, not both.
-  appView: getFromQueryString('probe') === null || getFromQueryString('probe') === 'null' ? 'DEFAULT' : 'PROBE',
-  probeView: getFromQueryString('probeView') || 'explore', // explore / table
 };
 
 export const store = createStore(initialState);
-
-store.setProbe = (name) => {
-  // get matching probe heree
-  const probe = get(probeSet).find((d) => d.name === name);
-  store.setField('probe', probe);
-  store.setField('appView', 'PROBE');
-};
 
 store.reset = () => {
   const { token } = get(store);
 
   store.reinitialize();
   store.setField('token', token);
-  store.setField('appView', 'DEFAULT');
   store.setField('probe', { name: null });
-  store.setField('probeView', 'explore');
 };
 
 export const resetFilters = () => {
@@ -147,14 +129,12 @@ function getParamsForQueryString(obj) {
   return {
     versions: obj.versions,
     channel: obj.channel,
-    probe: obj.probe.name,
     os: obj.os,
     aggregationLevel: obj.aggregationLevel,
     timeHorizon: obj.timeHorizon,
     proportionMetricType: obj.proportionMetricType,
     activeBuckets: obj.activeBuckets,
     visiblePercentiles: obj.visiblePercentiles,
-    probeView: obj.probeView,
   };
 }
 
@@ -166,7 +146,7 @@ function getParamsForDataAPI(obj) {
   delete params.proportionMetricType;
   delete params.activeBuckets;
   delete params.visiblePercentiles;
-  delete params.probeView;
+  params.probe = url.path.probe.name;
   params.os = osValue;
   params.channel = channelValue;
   return params;
@@ -256,24 +236,27 @@ export function isCategorical(probeType, probeKind) {
 export function fetchDataForGLAM(params) {
   return getProbeData(params, store.getState().token).then(
     (payload) => {
-      // FIXME: this should not be reading from the store.
-      // the response is kind of messed up so once the API / data is fixed
-      // the response shluld consume from payload.response[0].metric_type.
-      // until then, however, we'll have to use the store values
-      // for the probeType and probeKind, since they're more accurate than
-      // what is in payload.response[0].metric_type.
+      // FIXME: this should not be reading from probeSet. The response is kind
+      // of messed up, so once the API / data is fixed the response should
+      // consume from payload.response[0].metric_type. Until then, however,
+      // we'll have to use the probeSet values for the probeType and probeKind,
+      // since they're more accurate than what is in
+      // payload.response[0].metric_type.
       const st = get(store);
-      const { probe } = st;
       const { aggregationLevel } = st;
+
+      const {
+        active: probeActive,
+        type: probeType,
+        kind: probeKind,
+      } = get(currentProbe);
 
       if (!('response' in payload)) {
         const er = new Error('The data for this probe is unavailable.');
-        if (!probe.active) er.moreInformation = 'This probe appears to be inactive, so it\'s possible we don\'t have data for it.';
+        if (!probeActive) er.moreInformation = 'This probe appears to be inactive, so it\'s possible we don\'t have data for it.';
         throw er;
       }
 
-      const probeType = probe.type;
-      const probeKind = probe.kind;
       return {
         data: responseToData(payload.response,
           isCategorical(probeType, probeKind) ? 'proportion' : 'quantile',
@@ -294,9 +277,9 @@ function intersection(a, b) {
 }
 
 export function updateStoreAfterDataIsReceived({ data }) {
-  const st = store.getState();
+  const probe = get(currentProbe);
   // THIS WILL BE FALSE BECAUSE WE HAVE NOT RECEIVED THE PROBE DATA YET.
-  const viewType = getProbeViewType(st.probe.type, st.probe.kind);
+  const viewType = getProbeViewType(probe.type, probe.kind);
   const isCategoricalTypeProbe = viewType === 'categorical';
   let etc = {};
   if (isCategoricalTypeProbe) {
@@ -327,14 +310,14 @@ export const dataset = derived([store, probeSet], ([$store, $probeSet], set) => 
   const qs = toQueryString(params);
 
   // // invalid parameters, probe selected.
-  if (!paramsAreValid(params) && probeSelected($store.probe.name)) {
+  if (!paramsAreValid(params) && probeSelected(url.path.probe.name)) {
     const message = datasetResponse('ERROR', 'INVALID_PARAMETERS');
     // store.setField('dashboardMode', message);
     return message;
   }
 
   // // no probe selected.
-  if (!probeSelected($store.probe.name)) {
+  if (!probeSelected(url.path.probe.name)) {
     const message = datasetResponse('INFO', 'DEFAULT_VIEW');
     // if ($store.dashboardMode.key !== 'DEFAULT_VIEW') {
     //   store.setField('dashboardMode', message);

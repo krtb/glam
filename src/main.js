@@ -1,4 +1,4 @@
-import GLAM from './routes/index.svelte';
+import GLAM from './components/GLAM.svelte';
 import { authenticate } from './utils/auth';
 import { store } from './state/store';
 

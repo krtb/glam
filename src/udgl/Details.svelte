@@ -1,6 +1,9 @@
 <script>
 import { fly } from 'svelte/transition';
+
 import { store } from '../state/store';
+import { url } from '../state/url';
+import { currentProbe } from '../state/telemetry-search';
 import DetailSection from './DetailSection.svelte';
 
 let visible = true;
@@ -31,7 +34,7 @@ let visible = true;
 
     <DetailSection>
         <span slot='title'>
-            {$store.probe}
+            {$currentProbe}
         </span>
         <span slot='content'>
             

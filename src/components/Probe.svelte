@@ -1,0 +1,55 @@
+<script>
+  import Spinner from "udgl/LineSegSpinner.svelte";
+  import { fade, fly } from "svelte/transition";
+
+  // FIXME: get rid of this once the API / dataset is fixed.
+  // until then, we will need to keep this, since it's our only
+  // way of reading from the probe info service, which has the
+  // accurate probe information.
+  import { derived } from "svelte/store";
+
+  import Layout from "./Layout.svelte";
+  import DataError from "./errors/DataError.svelte";
+  import ProbeDetails from "./regions/ProbeDetails.svelte";
+
+  import { store, dataset } from "../state/store";
+  import { url } from "../state/url";
+  import { probeSet, currentProbe } from "../state/telemetry-search";
+  import { getProbeViewType } from "../utils/probe-utils";
+
+  // FIXME: for now, once we have retreived the data set, there are
+  // a few additional operations that need to be performed.
+  // to start, we will need to reset the activeBuckets in the non-
+  // initializing case.
+  //
+  // down the line, it would be good to figure out the right way to think
+  // about this whole pipeline. At the moment it does feel kind of weird to
+  // have the post-fetching step be in a component.
+  //
+  // ADDL FIXME: we should wait for the telemetry probes to load if that's what we're
+  // looking for here.
+
+  const temporaryViewTypeStore = derived(currentProbe, ($currentProbe) => {
+    if (!$currentProbe) return undefined;
+    return getProbeViewType($currentProbe.type, $currentProbe.kind);
+  });
+</script>
+
+{#await $dataset}
+  <div class="graphic-body__content">
+    <Spinner size={48} color={"var(--cool-gray-400)"} />
+  </div>
+{:then data}
+  <slot {data} temporaryViewTypeStore={$temporaryViewTypeStore}></slot>
+{:catch err}
+  <div class="graphic-body__content">
+    <div in:fly={{ duration: 400, y: 10 }}>
+      <DataError
+        reason={err.message}
+        moreInformation={err.moreInformation} />
+    </div>
+  </div>
+{/await}
+<div class="graphic-body__details">
+  <ProbeDetails />
+</div>
