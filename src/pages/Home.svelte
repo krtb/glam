@@ -6,9 +6,9 @@
   import QuantileSmallMultiple from "../components/default/Quantile.svelte";
   import ProportionSmallMultiple from "../components/default/Proportion.svelte";
   import RandomProbePlaceholder from "../components/default/RandomProbePlaceholder.svelte";
-  import { store } from "../state/store";
+  import { store, URLComponents } from "../state/store";
   import { getRandomProbes } from "../state/api";
-  import { url, probeURL } from "../state/url";
+  import { probeURL } from "../utils/routing";
 </script>
 
 <style>
@@ -103,7 +103,7 @@
             <div class="probe-overview__probe" in:fade={{ duration: 400 }}>
               <a
                 class="probe-sm"
-                href={probeURL({ product: url.path.probe.product, name: data[0].metadata.metric })}>
+                href={probeURL({ name: data[0].metadata.metric })}>
                 <div
                   class="probe-small-multiple"
                   class:probe-small-multiple--proportion={whichSmallMultiple(info.type, info.kind) === 'proportion'}

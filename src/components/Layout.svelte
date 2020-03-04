@@ -15,21 +15,19 @@ import Search from '../components/search/Search.svelte';
 import ProbeViewControl from '../components/controls/ProbeViewControl.svelte';
 import ProbeDetails from '../components/regions/ProbeDetails.svelte';
 
-import { currentQuery } from '../state/store';
-
-export let section;
+import { URLComponents } from '../state/store';
 
 let visible = false;
 
 function updateQueryString() {
   if (window.history.pushState) {
-    const newurl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?${$currentQuery}`;
+    const newurl = `${window.location.protocol}//${window.location.host}${window.location.pathname}${$URLComponents.search}`;
     window.history.pushState({ path: newurl }, '', newurl);
   }
 }
 
 $: if (visible) {
-  updateQueryString($currentQuery);
+  updateQueryString();
 }
 
 onMount(() => { visible = true; });
@@ -43,14 +41,14 @@ onMount(() => { visible = true; });
   </Toolbar>
   <Content centered>
     <ContentHeader>
-      {#if section === "probe"}
+      {#if $URLComponents.path.section === "probe"}
         <ProbeViewControl />
       {/if}
     </ContentHeader>
     <ContentBody>
       <div class="graphic-body">
         <slot></slot>
-        {#if section === "probe"}
+        {#if $URLComponents.path.section === "probe"}
           <!-- Marking up the probe details here ensures that they don't
                re-animate when the user switches between the Explore page and
                the Table page -->

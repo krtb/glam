@@ -6,10 +6,9 @@ import LineSegSpinner from 'udgl/LineSegSpinner.svelte';
 
 import {
     store,
+    telemetrySearch
 } from '../../state/store';
 
-
-import telemetrySearch from '../../state/telemetry-search';
 
 import TelemetrySearchResults from './SearchResults.svelte';
 

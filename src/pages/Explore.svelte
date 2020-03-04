@@ -5,8 +5,7 @@
   import Probe from "../components/Probe.svelte";
   import QuantileExplorerView from "../components/explore/QuantileExplorerView.svelte";
   import ProportionExplorerView from "../components/explore/ProportionExplorerView.svelte";
-  import { store } from "../state/store";
-  import { currentProbe } from "../state/telemetry-search";
+  import { store, currentProbe } from "../state/store";
   import { firefoxVersionMarkers } from '../state/product-versions';
 
   function handleBodySelectors(event) {

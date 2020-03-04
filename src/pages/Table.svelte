@@ -3,8 +3,7 @@
 
   import Probe from "../components/Probe.svelte";
   import ProbeTableView from "../components/table/ProbeTableView.svelte";
-  import { store } from "../state/store";
-  import { currentProbe } from "../state/telemetry-search";
+  import { store, currentProbe } from "../state/store";
 </script>
 
 <Probe let:data let:temporaryViewTypeStore>

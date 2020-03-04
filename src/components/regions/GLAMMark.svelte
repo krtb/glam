@@ -2,8 +2,7 @@
   import { tooltip } from "udgl/utils/tooltip";
   import Logo from "udgl/icons/GLAM.svelte";
 
-  import { store } from "../../state/store";
-  import { url } from "../../state/url";
+  import { store, URLComponents } from "../../state/store";
 </script>
 
 <style>
@@ -13,7 +12,7 @@
   }
 </style>
 
-<a href={`/${url.query}`} on:click={store.reset}>
+<a href={`/${$URLComponents.search}`} on:click={store.reset}>
   <h1>
     <Logo />
     <div

@@ -1,17 +1,17 @@
-import { derived, get } from 'svelte/store';
+import { readable, derived, get } from 'svelte/store';
+import FlexSearch from 'flexsearch';
 
 import { createCatColorMap } from 'udgl/data-graphics/utils/color-maps';
 import { createStore } from '../utils/create-store';
-
-// FIXME: take care of this dependency cycle.
-import telemetrySearch, { probeSet, currentProbe } from './telemetry-search'; // eslint-disable-line import/no-cycle
 
 import { getProbeData } from './api';
 
 import CONFIG from '../config.json';
 
+// TODO: Make this dynamic based on prod vs local dev.
+const probeURL = '__BASE_DOMAIN__/api/v1/probes/';
+
 import { byKeyAndAggregation, getProbeViewType } from '../utils/probe-utils';
-import { url } from './url';
 
 
 export function getField(fieldKey) {
@@ -90,6 +90,7 @@ const initialState = {
   proportionMetricType: getFromQueryString('proportionMetricType') || 'proportions', //
   activeBuckets: getFromQueryString('activeBuckets', true) || [],
   applicationStatus: 'INITIALIZING', // FIXME: applicationStatus or dashboardMode, not both.
+  url: window.location.href,
 };
 
 export const store = createStore(initialState);
@@ -99,7 +100,6 @@ store.reset = () => {
 
   store.reinitialize();
   store.setField('token', token);
-  store.setField('probe', { name: null });
 };
 
 export const resetFilters = () => {
@@ -107,6 +107,61 @@ export const resetFilters = () => {
   store.setField('os', getDefaultFieldValue('os'));
   store.setField('aggregationLevel', getDefaultFieldValue('aggregationLevel'));
 };
+
+export const URLComponents = derived(store, ($store) => {
+  const url = new URL($store.url);
+  const pathParts = url.pathname.split('/').filter((p) => p !== '');
+
+  const components = {
+    path: {
+      section: pathParts[0],
+    },
+  };
+
+  if (components.path.section === 'probe') {
+    components.path.probe = {
+      product: pathParts[1],
+      name: pathParts[2],
+      view: pathParts[3],
+    };
+  }
+
+  components.search = url.search;
+
+  return components;
+});
+
+export const probeSet = readable(undefined, async (set) => {
+  const resp = await fetch(probeURL).then((r) => r.json());
+  const data = Object.keys(resp.probes).map((key, i) => (
+    { id: i, ...resp.probes[key] }
+  ));
+  set(data);
+});
+
+export const currentProbe = derived([probeSet, URLComponents], ([$probeSet, $URLComponents]) => {
+  if (!$probeSet || $URLComponents.path.section !== 'probe') return undefined;
+  return $probeSet.find((d) => d.name === $URLComponents.path.probe.name);
+});
+
+export const telemetrySearch = derived([probeSet, currentProbe], ([$probeSet, $currentProbe]) => {
+  if (!$probeSet) return { loaded: false };
+
+  const search = new FlexSearch({
+    suggest: true,
+    // encode: 'advanced',
+    // tokenize: 'full',
+    // threshold: 1,
+    // resolution: 3,
+    doc: {
+      id: 'id',
+      field: ['name', 'description', 'type'],
+    },
+  });
+  search.add($probeSet);
+  search.loaded = true;
+  return search;
+}, { loaded: false });
 
 export const searchResults = derived(
   [telemetrySearch, store], ([$telemetrySearch, $store]) => {
@@ -138,15 +193,19 @@ function getParamsForQueryString(obj) {
   };
 }
 
-function getParamsForDataAPI(obj) {
-  const channelValue = getFieldValueKey('channel', obj.channel);
-  const osValue = getFieldValueKey('os', obj.os);
-  const params = getParamsForQueryString(obj);
+function getParamsForDataAPI(storeValue, URLComponentsValue) {
+  const channelValue = getFieldValueKey('channel', storeValue.channel);
+  const osValue = getFieldValueKey('os', storeValue.os);
+  const params = getParamsForQueryString(storeValue);
   delete params.timeHorizon;
   delete params.proportionMetricType;
   delete params.activeBuckets;
   delete params.visiblePercentiles;
-  params.probe = url.path.probe.name;
+
+  if (URLComponentsValue.path.section === 'probe') {
+    params.probe = URLComponentsValue.path.probe.name;
+  }
+
   params.os = osValue;
   params.channel = channelValue;
   return params;
@@ -297,7 +356,7 @@ export function updateStoreAfterDataIsReceived({ data }) {
 const cache = {};
 let previousQuery;
 
-export const dataset = derived([store, probeSet], ([$store, $probeSet], set) => {
+export const dataset = derived([store, probeSet, URLComponents], ([$store, $probeSet, $URLComponents], set) => {
   // FIXME: we have to check for whether probeSet is loaded before
   // moving on. This is because the data fetch does _not_ return
   // the proper information about probe types & kinds (specifically,
@@ -306,18 +365,18 @@ export const dataset = derived([store, probeSet], ([$store, $probeSet], set) => 
   // in the demo data is fixed.
   if (!$probeSet) return;
 
-  const params = getParamsForDataAPI($store);
+  const params = getParamsForDataAPI($store, $URLComponents);
   const qs = toQueryString(params);
 
   // // invalid parameters, probe selected.
-  if (!paramsAreValid(params) && probeSelected(url.path.probe.name)) {
+  if (!paramsAreValid(params) && $URLComponents.path.section === 'probe') {
     const message = datasetResponse('ERROR', 'INVALID_PARAMETERS');
     // store.setField('dashboardMode', message);
     return message;
   }
 
   // // no probe selected.
-  if (!probeSelected(url.path.probe.name)) {
+  if ($URLComponents.path.section !== 'probe') {
     const message = datasetResponse('INFO', 'DEFAULT_VIEW');
     // if ($store.dashboardMode.key !== 'DEFAULT_VIEW') {
     //   store.setField('dashboardMode', message);
@@ -336,9 +395,4 @@ export const dataset = derived([store, probeSet], ([$store, $probeSet], set) => 
     previousQuery = qs;
     set(cache[qs].then(updateStoreAfterDataIsReceived));
   }
-});
-
-export const currentQuery = derived(store, ($store) => {
-  const params = getParamsForQueryString($store);
-  return toQueryString(params);
 });

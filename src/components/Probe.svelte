@@ -11,8 +11,7 @@
   import Layout from "./Layout.svelte";
   import DataError from "./errors/DataError.svelte";
 
-  import { store, dataset } from "../state/store";
-  import { probeSet, currentProbe } from "../state/telemetry-search";
+  import { store, dataset, probeSet, currentProbe } from "../state/store";
   import { getProbeViewType } from "../utils/probe-utils";
 
   // FIXME: for now, once we have retreived the data set, there are

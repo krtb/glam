@@ -5,10 +5,7 @@ import LineSegSpinner from 'udgl/LineSegSpinner.svelte';
 import Button from 'udgl/Button.svelte';
 import StatusLabel from 'udgl/StatusLabel.svelte';
 import ExternalLink from 'udgl/icons/ExternalLink.svelte';
-import telemetrySearch from '../../state/telemetry-search';
-import { store, dataset } from '../../state/store';
-import { currentProbe } from '../../state/telemetry-search';
-
+import { store, dataset, currentProbe, telemetrySearch } from '../../state/store';
 import { downloadString } from '../../utils/download';
 
 

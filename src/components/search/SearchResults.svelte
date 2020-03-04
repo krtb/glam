@@ -6,7 +6,7 @@ import { afterUpdate } from 'svelte';
 import Portal from 'udgl/Portal.svelte';
 import LineSegSpinner from 'udgl/LineSegSpinner.svelte';
 
-import { navigateToProbe } from '../../state/url';
+import { navigateToProbe } from '../../utils/routing';
 import {
   searchResults, store,
 } from '../../state/store';
