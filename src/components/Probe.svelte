@@ -10,10 +10,8 @@
 
   import Layout from "./Layout.svelte";
   import DataError from "./errors/DataError.svelte";
-  import ProbeDetails from "./regions/ProbeDetails.svelte";
 
   import { store, dataset } from "../state/store";
-  import { url } from "../state/url";
   import { probeSet, currentProbe } from "../state/telemetry-search";
   import { getProbeViewType } from "../utils/probe-utils";
 
@@ -50,6 +48,4 @@
     </div>
   </div>
 {/await}
-<div class="graphic-body__details">
-  <ProbeDetails />
-</div>
+

@@ -10,7 +10,6 @@ import { store, dataset } from '../../state/store';
 import { currentProbe } from '../../state/telemetry-search';
 
 import { downloadString } from '../../utils/download';
-import { url } from '../../state/url';
 
 
 const paneTransition = { x: 10, duration: 300 };

@@ -59,5 +59,5 @@ export function probeURL({ product = 'firefox', name, view = 'explore' } = {}, p
 
 export function navigateToProbe(probeDetails, preserveQuery = true) {
   const nextURL = probeURL(probeDetails, preserveQuery);
-  page(nextURL);
+  page.show(nextURL);
 }

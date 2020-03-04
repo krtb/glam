@@ -8,7 +8,6 @@
   import { store } from "../state/store";
   import { currentProbe } from "../state/telemetry-search";
   import { firefoxVersionMarkers } from '../state/product-versions';
-  import { url } from '../state/url';
 
   function handleBodySelectors(event) {
     const { selection, type } = event.detail;

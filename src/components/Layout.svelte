@@ -13,9 +13,9 @@ import GLAMMark from '../components/regions/GLAMMark.svelte';
 import Footer from '../components/regions/Footer.svelte';
 import Search from '../components/search/Search.svelte';
 import ProbeViewControl from '../components/controls/ProbeViewControl.svelte';
+import ProbeDetails from '../components/regions/ProbeDetails.svelte';
 
 import { currentQuery } from '../state/store';
-import { url } from '../state/url';
 
 export let section;
 
@@ -33,11 +33,7 @@ $: if (visible) {
 }
 
 onMount(() => { visible = true; });
-
-let width;
 </script>
-
-<svelte:window bind:innerWidth={width} />
 
 <App>
   <Toolbar sticky>
@@ -54,6 +50,14 @@ let width;
     <ContentBody>
       <div class="graphic-body">
         <slot></slot>
+        {#if section === "probe"}
+          <!-- Marking up the probe details here ensures that they don't
+               re-animate when the user switches between the Explore page and
+               the Table page -->
+          <div class="graphic-body__details">
+            <ProbeDetails />
+          </div>
+        {/if}
       </div>
     </ContentBody>
     <ContentFooter>

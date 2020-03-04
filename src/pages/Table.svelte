@@ -5,7 +5,6 @@
   import ProbeTableView from "../components/table/ProbeTableView.svelte";
   import { store } from "../state/store";
   import { currentProbe } from "../state/telemetry-search";
-  import { url } from "../state/url";
 </script>
 
 <Probe let:data let:temporaryViewTypeStore>

@@ -3,12 +3,12 @@
 
   import Layout from "../components/Layout.svelte";
   import { store } from "../state/store";
-  import { url } from "../state/url";
 
   // Pages
   import Home from "../pages/Home.svelte";
   import Explore from "../pages/Explore.svelte";
   import Table from "../pages/Table.svelte";
+  import NotFound from "../pages/NotFound.svelte";
 
 
   let component;
@@ -19,23 +19,21 @@
     next();
   }
 
-  page(
-    "/",
-    updateSection,
-    () => component = Home,
-  );
+  function redirectToHomepage(path) {
+    page.redirect(path, "/");
+  }
 
-  page(
-    "/probe/:product/:name/explore",
-    updateSection,
-    () => component = Explore,
-  );
+  page("*", updateSection);
+  page("/", () => component = Home);
+  page("/probe/:probeProduct/:probeName/explore", () => component = Explore);
+  page("/probe/:probeProduct/:probeName/table", () => component = Table);
 
-  page(
-    "/probe/:product/:name/table",
-    updateSection,
-    () => component = Table,
-  );
+  // Redirect partial routes to the homepage
+  redirectToHomepage("/probe");
+  redirectToHomepage("/probe/*");
+  redirectToHomepage("/probe/*/*");
+
+  page("*", () => component = NotFound);
 
   page.start();
 </script>
